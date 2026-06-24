@@ -1,5 +1,6 @@
 import model.Document;
 import service.FileManager;
+import undo.*;
 
 import java.util.Scanner;
 
@@ -10,9 +11,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         Document document = new Document();
-
-        FileManager fileManager =
-                new FileManager();
+        FileManager fileManager = new FileManager();
+        UndoManager undoManager = new UndoManager();
 
         while (true) {
 
@@ -28,6 +28,16 @@ public class Main {
                             + "] ====="
             );
 
+            System.out.println(
+                    "Undo History : "
+                            + undoManager.getUndoSize()
+            );
+
+            System.out.println(
+                    "Redo History : "
+                            + undoManager.getRedoSize()
+            );
+
             System.out.println("1. New Document");
             System.out.println("2. Append Content");
             System.out.println("3. View Content");
@@ -35,16 +45,16 @@ public class Main {
             System.out.println("5. Open File");
             System.out.println("6. Character Count");
             System.out.println("7. Word Count");
-           // System.out.println("8. Exit");
             System.out.println("8. Insert At Index");
             System.out.println("9. Delete Range");
             System.out.println("10. Replace Range");
             System.out.println("11. Find Word");
             System.out.println("12. Find All Occurrences");
-            System.out.println("13. Exit");
-            System.out.print(
-                    "Enter choice: "
-            );
+            System.out.println("13. Undo");
+            System.out.println("14. Redo");
+            System.out.println("15. Exit");
+
+            System.out.print("\nEnter choice: ");
 
             int choice = sc.nextInt();
             sc.nextLine();
@@ -53,13 +63,9 @@ public class Main {
 
                 case 1:
 
-                    if (canProceed(
-                            sc,
-                            document
-                    )) {
+                    if (canProceed(sc, document)) {
 
-                        document =
-                                new Document();
+                        document = new Document();
 
                         System.out.println(
                                 "New document created."
@@ -71,15 +77,15 @@ public class Main {
                 case 2:
 
                     System.out.println(
-                            "Enter content "
-                                    + "(END to stop)"
+                            "Enter content (END to stop)"
                     );
 
-                    String line;
+                    StringBuilder content =
+                            new StringBuilder();
 
                     while (true) {
 
-                        line =
+                        String line =
                                 sc.nextLine();
 
                         if (line.equalsIgnoreCase(
@@ -88,19 +94,24 @@ public class Main {
                             break;
                         }
 
-                        document
-                                .getBuffer()
-                                .insert(
-                                        document
-                                                .getBuffer()
-                                                .length(),
-                                        line + "\n"
-                                );
+                        content.append(line)
+                                .append("\n");
                     }
 
-                    document.setModified(
-                            true
+                    Command appendCommand =
+                            new InsertCommand(
+                                    document.getBuffer(),
+                                    document
+                                            .getBuffer()
+                                            .length(),
+                                    content.toString()
+                            );
+
+                    undoManager.executeCommand(
+                            appendCommand
                     );
+
+                    document.setModified(true);
 
                     System.out.println(
                             "Content appended."
@@ -144,10 +155,7 @@ public class Main {
 
                 case 5:
 
-                    if (canProceed(
-                            sc,
-                            document
-                    )) {
+                    if (canProceed(sc, document)) {
 
                         System.out.print(
                                 "Enter file name: "
@@ -187,71 +195,132 @@ public class Main {
                     break;
 
                 case 8:
-                    System.out.print("Enter Index: ");
-                    int insertIndex = sc.nextInt();
+
+                    System.out.print(
+                            "Enter Index: "
+                    );
+
+                    int insertIndex =
+                            sc.nextInt();
+
                     sc.nextLine();
 
-                    System.out.print("Enter Text: ");
-                    String insertText = sc.nextLine();
+                    System.out.print(
+                            "Enter Text: "
+                    );
 
-                    document.getBuffer()
-                            .insert(insertIndex, insertText);
+                    String insertText =
+                            sc.nextLine();
+
+                    Command insertCommand =
+                            new InsertCommand(
+                                    document.getBuffer(),
+                                    insertIndex,
+                                    insertText
+                            );
+
+                    undoManager.executeCommand(
+                            insertCommand
+                    );
 
                     document.setModified(true);
 
-                    System.out.println("Text inserted.");
+                    System.out.println(
+                            "Text inserted."
+                    );
 
                     break;
 
                 case 9:
 
-                    System.out.print("Start Index: ");
-                    int start = sc.nextInt();
+                    System.out.print(
+                            "Start Index: "
+                    );
 
-                    System.out.print("End Index: ");
-                    int end = sc.nextInt();
+                    int start =
+                            sc.nextInt();
+
+                    System.out.print(
+                            "End Index: "
+                    );
+
+                    int end =
+                            sc.nextInt();
 
                     sc.nextLine();
 
-                    document.getBuffer()
-                            .delete(start, end);
+                    Command deleteCommand =
+                            new DeleteCommand(
+                                    document.getBuffer(),
+                                    start,
+                                    end
+                            );
+
+                    undoManager.executeCommand(
+                            deleteCommand
+                    );
 
                     document.setModified(true);
 
-                    System.out.println("Text deleted.");
+                    System.out.println(
+                            "Text deleted."
+                    );
 
                     break;
 
                 case 10:
 
-                    System.out.print("Start Index: ");
-                    int replaceStart = sc.nextInt();
+                    System.out.print(
+                            "Start Index: "
+                    );
 
-                    System.out.print("End Index: ");
-                    int replaceEnd = sc.nextInt();
+                    int replaceStart =
+                            sc.nextInt();
+
+                    System.out.print(
+                            "End Index: "
+                    );
+
+                    int replaceEnd =
+                            sc.nextInt();
 
                     sc.nextLine();
 
-                    System.out.print("Replacement Text: ");
-                    String replacement = sc.nextLine();
+                    System.out.print(
+                            "Replacement Text: "
+                    );
 
-                    document.getBuffer()
-                            .replace(
+                    String replacement =
+                            sc.nextLine();
+
+                    Command replaceCommand =
+                            new ReplaceCommand(
+                                    document.getBuffer(),
                                     replaceStart,
                                     replaceEnd,
                                     replacement
                             );
 
+                    undoManager.executeCommand(
+                            replaceCommand
+                    );
+
                     document.setModified(true);
 
-                    System.out.println("Text replaced.");
+                    System.out.println(
+                            "Text replaced."
+                    );
 
                     break;
 
                 case 11:
 
-                    System.out.print("Enter Word: ");
-                    String word = sc.nextLine();
+                    System.out.print(
+                            "Enter Word: "
+                    );
+
+                    String word =
+                            sc.nextLine();
 
                     int index =
                             document.getBuffer()
@@ -275,7 +344,10 @@ public class Main {
 
                 case 12:
 
-                    System.out.print("Enter Word: ");
+                    System.out.print(
+                            "Enter Word: "
+                    );
+
                     String searchWord =
                             sc.nextLine();
 
@@ -290,7 +362,25 @@ public class Main {
 
                 case 13:
 
+                    undoManager.undo();
 
+                    System.out.println(
+                            "Undo successful."
+                    );
+
+                    break;
+
+                case 14:
+
+                    undoManager.redo();
+
+                    System.out.println(
+                            "Redo successful."
+                    );
+
+                    break;
+
+                case 15:
 
                     if (canProceed(
                             sc,
@@ -303,7 +393,6 @@ public class Main {
 
                         return;
                     }
-
 
                     break;
 
@@ -324,8 +413,7 @@ public class Main {
         if (document.isModified()) {
 
             System.out.print(
-                    "Unsaved changes exist. "
-                            + "Discard? (Y/N): "
+                    "Unsaved changes exist. Discard? (Y/N): "
             );
 
             String response =
