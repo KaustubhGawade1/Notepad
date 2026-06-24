@@ -1,17 +1,19 @@
 package model;
 
+import buffer.TextBuffer;
+
 public class Document {
-    private String content = "";
-    private String name = "Untitled";
-    private boolean modified = false; // Tracks unsaved changes
 
-    public String getContent() {
-        return content;
-    }
+    private String name;
+    private boolean modified;
 
-    public void setContent(String content) {
-        this.content = content;
-        this.modified = true; // Any change flags the document as modified
+    private TextBuffer buffer;
+
+    public Document() {
+
+        this.name = "Untitled";
+        this.modified = false;
+        this.buffer = new TextBuffer();
     }
 
     public String getName() {
@@ -20,6 +22,10 @@ public class Document {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public TextBuffer getBuffer() {
+        return buffer;
     }
 
     public boolean isModified() {
