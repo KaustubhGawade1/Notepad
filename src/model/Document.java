@@ -1,19 +1,24 @@
 package model;
 
 import buffer.TextBuffer;
+import event.EventManager;
 
 public class Document {
 
     private String name;
     private boolean modified;
+    private EventManager eventManager;
 
     private TextBuffer buffer;
 
-    public Document() {
+    public Document(EventManager eventManager) {
 
         this.name = "Untitled";
         this.modified = false;
-        this.buffer = new TextBuffer();
+
+        this.eventManager = eventManager;
+
+        this.buffer = new TextBuffer(eventManager);
     }
 
     public String getName() {

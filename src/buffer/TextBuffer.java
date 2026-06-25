@@ -1,11 +1,25 @@
 package buffer;
 
+import event.*;
+import event.listeners.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TextBuffer {
 
     private StringBuilder buffer;
+
+    private EventManager eventManager;
+
+    public TextBuffer(
+            EventManager eventManager
+    ) {
+        this.eventManager =
+                eventManager;
+
+        buffer =
+                new StringBuilder();
+    }
 
     public TextBuffer() {
         buffer = new StringBuilder();
@@ -21,16 +35,42 @@ public class TextBuffer {
             throw new IllegalArgumentException("Invalid index");
         }
 
-        buffer.insert(index, text);
-    }
+        String oldText =
+                buffer.toString();
+
+        buffer.insert(
+                index,
+                text
+        );
+
+        String newText =
+                buffer.toString();
+
+        eventManager.notify(
+                new TextChangedEvent(
+                        oldText,
+                        newText
+                )
+        );    }
 
     public void delete(int start, int end) {
 
         if (start < 0 || end > buffer.length() || start > end) {
             throw new IllegalArgumentException("Invalid range");
         }
+        String oldText =
+                buffer.toString();
 
         buffer.delete(start, end);
+
+        String newText =
+                buffer.toString();
+
+        eventManager.notify(
+                new TextChangedEvent(
+                        oldText,
+                        newText
+                ) );
     }
 
     public void replace(int start, int end, String text) {
@@ -38,8 +78,22 @@ public class TextBuffer {
         if (start < 0 || end > buffer.length() || start > end) {
             throw new IllegalArgumentException("Invalid range");
         }
+        String oldText =
+                buffer.toString();
+
 
         buffer.replace(start, end, text);
+
+
+
+        String newText =
+                buffer.toString();
+
+        eventManager.notify(
+                new TextChangedEvent(
+                        oldText,
+                        newText
+                )        );
     }
 
     public String getText() {
