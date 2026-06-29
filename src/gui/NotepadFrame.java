@@ -4,7 +4,6 @@ import controller.EditorController;
 import gui.menu.MenuBarBuilder;
 import gui.toolbar.ToolBarBuilder;
 import gui.dialog.FindDialog;
-import java.awt.event.*;
 import javax.swing.*;
 import java.awt.*;
 
@@ -293,15 +292,26 @@ public class NotepadFrame extends JFrame {
         setLayout(new BorderLayout());
 
         // 1. Create EditorPanel FIRST
-        editorPanel =
-                new EditorPanel(controller);
-
-        add(editorPanel, BorderLayout.CENTER);
-
         statusBar =
                 new StatusBar();
 
-        add(statusBar, BorderLayout.SOUTH);
+        add(
+                statusBar,
+                BorderLayout.SOUTH
+        );
+
+        editorPanel =
+                new EditorPanel(
+                        controller,
+                        statusBar
+                );
+
+        add(
+                editorPanel,
+                BorderLayout.CENTER
+        );
+
+
 
         findDialog =
                 new FindDialog(

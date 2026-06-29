@@ -1,7 +1,6 @@
 package buffer;
 
 import event.*;
-import event.listeners.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +18,6 @@ public class TextBuffer {
 
         buffer =
                 new StringBuilder();
-    }
-
-    public TextBuffer() {
-        buffer = new StringBuilder();
-    }
-
-    public TextBuffer(String text) {
-        buffer = new StringBuilder(text);
     }
 
     public void insert(int index, String text) {

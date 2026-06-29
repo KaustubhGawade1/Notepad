@@ -1,2 +1,0 @@
-this is textbuffer method with 
-implementation working

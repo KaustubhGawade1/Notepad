@@ -24,14 +24,23 @@ public class UndoManager {
         redoStack.clear();
     }
 
+    /**
+     * Records a command that was already executed
+     * (e.g., by the JTextArea itself).
+     * Pushes to undo stack without calling execute().
+     */
+    public void recordCommand(
+            Command command
+    ) {
+
+        undoStack.push(command);
+
+        redoStack.clear();
+    }
+
     public void undo() {
 
         if (undoStack.isEmpty()) {
-
-            System.out.println(
-                    "Nothing to Undo"
-            );
-
             return;
         }
 
@@ -46,11 +55,6 @@ public class UndoManager {
     public void redo() {
 
         if (redoStack.isEmpty()) {
-
-            System.out.println(
-                    "Nothing to Redo"
-            );
-
             return;
         }
 
@@ -68,5 +72,10 @@ public class UndoManager {
 
     public int getRedoSize() {
         return redoStack.size();
+    }
+
+    public void clear() {
+        undoStack.clear();
+        redoStack.clear();
     }
 }

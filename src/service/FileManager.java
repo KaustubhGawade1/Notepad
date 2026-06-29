@@ -1,6 +1,7 @@
 package service;
 
 import model.Document;
+import javax.swing.JOptionPane;
 import java.io.*;
 
 public class FileManager {
@@ -10,18 +11,27 @@ public class FileManager {
         try (FileWriter writer = new FileWriter(fileName)) {
 
             writer.write(
-                    // 1st doubt how it works
                     document.getBuffer().getText()
             );
 
             document.setName(fileName);
             document.setModified(false);
 
-            System.out.println("File saved successfully.");
+            JOptionPane.showMessageDialog(
+                    null,
+                    "File saved successfully.",
+                    "Save",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
 
         } catch (IOException e) {
 
-            System.out.println("Error while saving file.");
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Error while saving file.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -52,14 +62,20 @@ public class FileManager {
             document.setName(fileName);
             document.setModified(false);
 
-            System.out.println(
-                    "File opened successfully."
+            JOptionPane.showMessageDialog(
+                    null,
+                    "File opened successfully.",
+                    "Open",
+                    JOptionPane.INFORMATION_MESSAGE
             );
 
         } catch (IOException e) {
 
-            System.out.println(
-                    "Error while opening file."
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Error while opening file.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
     }

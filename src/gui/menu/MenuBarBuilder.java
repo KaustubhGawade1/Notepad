@@ -7,10 +7,12 @@ import gui.dialog.FindDialog;
 import javax.swing.*;
 
 public class MenuBarBuilder {
+
     private final StatusBar statusBar;
     private final EditorController controller;
-  private EditorPanel editorPanel;
+    private final EditorPanel editorPanel;
     private final FindDialog findDialog;
+
     public MenuBarBuilder(
             EditorController controller,
             EditorPanel editorPanel,
@@ -38,58 +40,50 @@ public class MenuBarBuilder {
         JMenu searchMenu =
                 new JMenu("Search");
 
-        menuBar.add(searchMenu);
+        JMenu helpMenu =
+                new JMenu("Help");
 
         JMenuItem findItem =
                 new JMenuItem("Find");
-
-        searchMenu.add(findItem);
 
         JMenuItem newItem =
                 new JMenuItem("New");
 
         JMenuItem openItem =
                 new JMenuItem("Open");
-        JMenu helpMenu =
-                new JMenu("Help");
 
-        menuBar.add(helpMenu);
         JMenuItem saveItem =
                 new JMenuItem("Save");
 
         JMenuItem exitItem =
                 new JMenuItem("Exit");
+
         JMenuItem undoItem =
                 new JMenuItem("Undo");
 
         JMenuItem redoItem =
                 new JMenuItem("Redo");
+
         fileMenu.add(newItem);
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
-        menuBar.add(fileMenu);
-        menuBar.add(editMenu);
-        menuBar.add(helpMenu);
         editMenu.add(undoItem);
         editMenu.add(redoItem);
+
+        searchMenu.add(findItem);
+
+        menuBar.add(fileMenu);
+        menuBar.add(editMenu);
+        menuBar.add(searchMenu);
+        menuBar.add(helpMenu);
+
         /*
          * Actions
          */
 
-//        newItem.addActionListener(e -> {
-//
-//            controller.newDocument();
-//
-//        });
-
-//        exitItem.addActionListener(e -> {
-//
-//            System.exit(0);
-//
-//        });
         newItem.addActionListener(e -> {
 
             int option =
@@ -103,17 +97,11 @@ public class MenuBarBuilder {
             if (option == JOptionPane.YES_OPTION) {
 
                 controller.clearDocument();
-
+                controller.markSaved();
                 editorPanel.clear();
-
-                statusBar.updateStatus(
-                        "",
-                        false
-                );
-
             }
-
         });
+
         saveItem.addActionListener(e -> {
 
             JFileChooser chooser =
@@ -131,14 +119,15 @@ public class MenuBarBuilder {
                         editorPanel.getText()
                 );
 
+                controller.markSaved();
+
                 statusBar.updateStatus(
-                        editorPanel.getText(),
+                        editorPanel.getTextArea(),
                         false
                 );
-
             }
-
         });
+
         openItem.addActionListener(e -> {
 
             JFileChooser chooser =
@@ -150,41 +139,39 @@ public class MenuBarBuilder {
             if (result == JFileChooser.APPROVE_OPTION) {
 
                 controller.openDocument(
-
                         chooser
                                 .getSelectedFile()
                                 .getAbsolutePath()
-
                 );
+
+                controller.markSaved();
 
                 editorPanel.setText(
                         controller.getText()
                 );
-                statusBar.updateStatus(
-                        controller.getText(),
-                        false
-                );
             }
-
         });
+
         undoItem.addActionListener(e -> {
 
             editorPanel.undo();
-
         });
 
         redoItem.addActionListener(e -> {
 
             editorPanel.redo();
-
         });
+
+        findItem.addActionListener(e -> {
+
+            findDialog.setVisible(true);
+        });
+
         exitItem.addActionListener(e -> {
 
             System.exit(0);
-
         });
 
         return menuBar;
     }
-
 }

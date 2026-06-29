@@ -36,6 +36,8 @@ public class EditorController {
         document.setModified(false);
 
         document.setName("Untitled");
+
+        undoManager.clear();
     }
 
     public void saveDocument(
@@ -64,6 +66,8 @@ public class EditorController {
                 document,
                 fileName
         );
+
+        undoManager.clear();
     }
 
     /*
@@ -93,8 +97,6 @@ public class EditorController {
                         0,
                         text
                 );
-
-        document.setModified(true);
     }
 
     /*
@@ -108,7 +110,6 @@ public class EditorController {
         undoManager.undo();
 
         document.setModified(true);
-
     }
 
     public void redo() {
@@ -116,7 +117,6 @@ public class EditorController {
         undoManager.redo();
 
         document.setModified(true);
-
     }
 
     /*
@@ -128,19 +128,30 @@ public class EditorController {
     public Document getDocument() {
 
         return document;
+    }
 
+    public UndoManager getUndoManager() {
+
+        return undoManager;
     }
 
     public boolean isModified() {
 
         return document.isModified();
-
     }
 
     public String getDocumentName() {
 
         return document.getName();
-
     }
 
+    public void markModified() {
+
+        document.setModified(true);
+    }
+
+    public void markSaved() {
+
+        document.setModified(false);
+    }
 }

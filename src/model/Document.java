@@ -7,7 +7,6 @@ public class Document {
 
     private String name;
     private boolean modified;
-    private EventManager eventManager;
 
     private TextBuffer buffer;
 
@@ -15,8 +14,6 @@ public class Document {
 
         this.name = "Untitled";
         this.modified = false;
-
-        this.eventManager = eventManager;
 
         this.buffer = new TextBuffer(eventManager);
     }
