@@ -29,7 +29,7 @@ public class EditorController {
      * ------------------------
      */
 
-    public void newDocument() {
+    public void clearDocument() {
 
         document.getBuffer().clear();
 
@@ -38,7 +38,17 @@ public class EditorController {
         document.setName("Untitled");
     }
 
-    public void save(String fileName) {
+    public void saveDocument(
+            String fileName,
+            String text
+    ) {
+
+        document.getBuffer().clear();
+
+        document.getBuffer().insert(
+                0,
+                text
+        );
 
         fileManager.save(
                 document,
@@ -46,13 +56,21 @@ public class EditorController {
         );
     }
 
-    public void open(String fileName) {
+    public void openDocument(
+            String fileName
+    ) {
 
         fileManager.open(
                 document,
                 fileName
         );
     }
+
+    /*
+     * ------------------------
+     * Text Operations
+     * ------------------------
+     */
 
     public String getText() {
 
@@ -61,7 +79,9 @@ public class EditorController {
                 .getText();
     }
 
-    public void setText(String text) {
+    public void setText(
+            String text
+    ) {
 
         document
                 .getBuffer()
@@ -76,6 +96,12 @@ public class EditorController {
 
         document.setModified(true);
     }
+
+    /*
+     * ------------------------
+     * Undo / Redo
+     * ------------------------
+     */
 
     public void undo() {
 
@@ -93,36 +119,28 @@ public class EditorController {
 
     }
 
+    /*
+     * ------------------------
+     * Getters
+     * ------------------------
+     */
+
     public Document getDocument() {
+
         return document;
+
     }
-    public void saveCurrentDocument(String fileName, String text) {
 
-        document.getBuffer().clear();
+    public boolean isModified() {
 
-        document.getBuffer().insert(
-                0,
-                text
-        );
+        return document.isModified();
 
-        fileManager.save(
-                document,
-                fileName
-        );
     }
-    public void openDocument(String fileName) {
 
-        fileManager.open(
-                document,
-                fileName
-        );
+    public String getDocumentName() {
+
+        return document.getName();
+
     }
-    public void clearDocument() {
 
-        document.getBuffer().clear();
-
-        document.setModified(false);
-
-        document.setName("Untitled");
-    }
 }

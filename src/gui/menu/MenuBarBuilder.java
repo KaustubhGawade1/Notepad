@@ -1,21 +1,27 @@
-package gui;
+package gui.menu;
 
 import controller.EditorController;
-
+import gui.EditorPanel;
+import gui.StatusBar;
+import gui.dialog.FindDialog;
 import javax.swing.*;
 
 public class MenuBarBuilder {
-
+    private final StatusBar statusBar;
     private final EditorController controller;
   private EditorPanel editorPanel;
-    public MenuBarBuilder(EditorController controller,
-                          EditorPanel editorPanel) {
+    private final FindDialog findDialog;
+    public MenuBarBuilder(
+            EditorController controller,
+            EditorPanel editorPanel,
+            StatusBar statusBar,
+            FindDialog findDialog
+    ) {
 
         this.controller = controller;
         this.editorPanel = editorPanel;
-
-        System.out.println("Received EditorPanel = " + editorPanel);
-        System.out.println("Stored EditorPanel = " + this.editorPanel);
+        this.statusBar = statusBar;
+        this.findDialog = findDialog;
     }
 
     public JMenuBar build() {
@@ -29,15 +35,25 @@ public class MenuBarBuilder {
         JMenu editMenu =
                 new JMenu("Edit");
 
-        JMenu helpMenu =
-                new JMenu("Help");
+        JMenu searchMenu =
+                new JMenu("Search");
+
+        menuBar.add(searchMenu);
+
+        JMenuItem findItem =
+                new JMenuItem("Find");
+
+        searchMenu.add(findItem);
 
         JMenuItem newItem =
                 new JMenuItem("New");
 
         JMenuItem openItem =
                 new JMenuItem("Open");
+        JMenu helpMenu =
+                new JMenu("Help");
 
+        menuBar.add(helpMenu);
         JMenuItem saveItem =
                 new JMenuItem("Save");
 
@@ -90,7 +106,13 @@ public class MenuBarBuilder {
 
                 editorPanel.clear();
 
+                statusBar.updateStatus(
+                        "",
+                        false
+                );
+
             }
+
         });
         saveItem.addActionListener(e -> {
 
@@ -102,14 +124,16 @@ public class MenuBarBuilder {
 
             if (result == JFileChooser.APPROVE_OPTION) {
 
-                controller.saveCurrentDocument(
-
-                        chooser
-                                .getSelectedFile()
+                controller.saveDocument(
+                        chooser.getSelectedFile()
                                 .getAbsolutePath(),
 
                         editorPanel.getText()
+                );
 
+                statusBar.updateStatus(
+                        editorPanel.getText(),
+                        false
                 );
 
             }
@@ -136,27 +160,22 @@ public class MenuBarBuilder {
                 editorPanel.setText(
                         controller.getText()
                 );
-
+                statusBar.updateStatus(
+                        controller.getText(),
+                        false
+                );
             }
 
         });
         undoItem.addActionListener(e -> {
 
-            controller.undo();
-
-            editorPanel.setText(
-                    controller.getText()
-            );
+            editorPanel.undo();
 
         });
 
         redoItem.addActionListener(e -> {
 
-            controller.redo();
-
-            editorPanel.setText(
-                    controller.getText()
-            );
+            editorPanel.redo();
 
         });
         exitItem.addActionListener(e -> {

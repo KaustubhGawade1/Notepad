@@ -1,15 +1,20 @@
 package gui;
 
 import controller.EditorController;
-import java.util.*;
+import gui.menu.MenuBarBuilder;
+import gui.toolbar.ToolBarBuilder;
+import gui.dialog.FindDialog;
+import java.awt.event.*;
 import javax.swing.*;
 import java.awt.*;
 
 public class NotepadFrame extends JFrame {
     private EditorPanel editorPanel;
-
+    private ToolBarBuilder toolBarBuilder;
+    private StatusBar statusBar;
     private final EditorController controller;
     private MenuBarBuilder menuBarBuilder;
+    private FindDialog findDialog;
     public NotepadFrame(EditorController controller) {
 
         this.controller = controller;
@@ -24,6 +29,255 @@ public class NotepadFrame extends JFrame {
     public EditorController getController() {
 
         return controller;
+
+    }
+    private void initializeShortcuts() {
+
+        JRootPane root = getRootPane();
+
+        InputMap inputMap =
+                root.getInputMap(
+                        JComponent.WHEN_IN_FOCUSED_WINDOW
+                );
+
+        ActionMap actionMap =
+                root.getActionMap();
+
+        /*
+         * Ctrl + N
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control N"
+                ),
+
+                "new"
+
+        );
+
+        actionMap.put(
+
+                "new",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        controller.clearDocument();
+
+                        editorPanel.clear();
+
+                    }
+
+                }
+
+        );
+
+        /*
+         * Ctrl + O
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control O"
+                ),
+
+                "open"
+
+        );
+
+        actionMap.put(
+
+                "open",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        JFileChooser chooser =
+                                new JFileChooser();
+
+                        if (chooser.showOpenDialog(
+                                NotepadFrame.this
+                        ) == JFileChooser.APPROVE_OPTION) {
+
+                            controller.openDocument(
+
+                                    chooser
+                                            .getSelectedFile()
+                                            .getAbsolutePath()
+
+                            );
+
+                            editorPanel.setText(
+                                    controller.getText()
+                            );
+
+                        }
+
+                    }
+
+                }
+
+        );
+
+        /*
+         * Ctrl + S
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control S"
+                ),
+
+                "save"
+
+        );
+
+        actionMap.put(
+
+                "save",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        JFileChooser chooser =
+                                new JFileChooser();
+
+                        if (chooser.showSaveDialog(
+                                NotepadFrame.this
+                        ) == JFileChooser.APPROVE_OPTION) {
+
+                            controller.saveDocument(
+
+                                    chooser
+                                            .getSelectedFile()
+                                            .getAbsolutePath(),
+
+                                    editorPanel.getText()
+
+                            );
+
+                        }
+
+                    }
+
+                }
+
+        );
+
+        /*
+         * Ctrl + Z
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control Z"
+                ),
+
+                "undo"
+
+        );
+
+        actionMap.put(
+
+                "undo",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        editorPanel.undo();
+
+                    }
+
+                }
+
+        );
+
+        /*
+         * Ctrl + Y
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control Y"
+                ),
+
+                "redo"
+
+        );
+
+        actionMap.put(
+
+                "redo",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        editorPanel.redo();
+
+                    }
+
+                }
+
+        );
+
+        /*
+         * Ctrl + F
+         */
+
+        inputMap.put(
+
+                KeyStroke.getKeyStroke(
+                        "control F"
+                ),
+
+                "find"
+
+        );
+
+        actionMap.put(
+
+                "find",
+
+                new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent e
+                    ) {
+
+                        findDialog.setVisible(true);
+
+                    }
+
+                }
+
+        );
 
     }
     private void initializeFrame() {
@@ -42,27 +296,44 @@ public class NotepadFrame extends JFrame {
         editorPanel =
                 new EditorPanel(controller);
 
-        System.out.println(
-                "EditorPanel = " + editorPanel
-        );
+        add(editorPanel, BorderLayout.CENTER);
 
-        // 2. Add it
-        add(
-                editorPanel,
-                BorderLayout.CENTER
-        );
+        statusBar =
+                new StatusBar();
 
-        // 3. Now create MenuBarBuilder
-        menuBarBuilder =
-                new MenuBarBuilder(
-                        controller,
+        add(statusBar, BorderLayout.SOUTH);
+
+        findDialog =
+                new FindDialog(
+                        this,
                         editorPanel
                 );
 
-        // 4. Set menu
+        menuBarBuilder =
+                new MenuBarBuilder(
+                        controller,
+                        editorPanel,
+                        statusBar,
+                        findDialog
+                );
+
         setJMenuBar(
                 menuBarBuilder.build()
         );
+
+        toolBarBuilder =
+                new ToolBarBuilder(
+                        controller,
+                        editorPanel,
+                        findDialog
+                );
+
+        add(
+                toolBarBuilder.build(),
+                BorderLayout.NORTH
+        );
+
+        initializeShortcuts();
 
         setVisible(true);
     }
