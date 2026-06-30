@@ -24,3 +24,4 @@ cd src
 javac $(find . -name "*.java")
 java Main
 ```
+# Notepadvibe
